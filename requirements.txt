@@ -1,0 +1,4 @@
+azure-mgmt-resource
+azure-mgmt-storage>=3.0.0
+azure-storage-blob
+haikunator
