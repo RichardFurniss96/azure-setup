@@ -15,6 +15,7 @@ from azure.storage.blob import (
     BlobServiceClient,
     ContainerClient
 )
+import time
 
 class SetupAccount:
 
@@ -62,6 +63,8 @@ class SetupAccount:
         # Creates AZ resource group with name from arguements and location from arguements
         client.resource_groups.create_or_update(self.args.resource_group, resource_group_params)
 
+        print("Creating resource group: " + self.args.resource_group)
+
     def storage_account(self):
         # Creates storage account using arguements from above
         storage_client = StorageManagementClient(self.credentials(), self.subscription_id())
@@ -76,6 +79,7 @@ class SetupAccount:
         )
         storage_account = storage_async_operation.result()
 
+        print("Creating storage account: " + self.args.storage_account)
         return storage_account
 
     def connect_str(self):
@@ -90,13 +94,27 @@ class SetupAccount:
         container_client = blob_service_client.create_container(self.args.container_name)
         return container_client
 
+    def setup_backend(self):
+        fin = open("terraform/variables.tf", "rt")
+        data = fin.read()
+        data = data.replace('rn', str(self.args.resource_group).strip('()'))
+        data = data.replace('cn', str(self.args.container_name).strip('()'))
+        data = data.replace('sn', str(self.args.storage_account).strip('()'))
+        fin.close()
+
+        fin = open("terraform/terraform.tfvars", "wt")
+        fin.write(data)
+        fin.close()
+
     def execute(self):
         self.credentials()
         self.subscription_id()
         self.resource_group()
+        time.sleep(10)
         self.storage_account()
         self.connect_str()
         self.storage_container()
+        self.setup_backend()
 
 if __name__ == "__main__":
     SetupAccount().execute()
