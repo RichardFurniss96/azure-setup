@@ -26,8 +26,8 @@ az ad sp create-for-rbac --name $YourServicePrincipalName
 Once the Service Principal has been created you will need to export the following
 
 ```bash
-export AZURE_CLIENT_ID={your client id}
-export AZURE_CLIENT_SECRET={your client secret}
+export AZURE_CLIENT_ID=$YourClientID
+export AZURE_CLIENT_SECRET=$YourClientSecret
 ```
 
 You should then be able to run the python script
